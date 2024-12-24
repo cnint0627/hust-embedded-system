@@ -2,11 +2,18 @@
 #include "game.h"
 #include <string.h>
 
+int init_current_player = 0;
+
 void game_init(Game *game) {
     memset(game, 0, sizeof(Game));
     chess_init(&game->chess);
     game->state = GAME_PLAYING;
-    game->current_player = 0;  // 红方先手
+    game->current_player = init_current_player;
+    if (init_current_player) {
+        printf("红方\n");
+    } else {
+        printf("黑方\n");
+    }
     game->has_selected = false;
 }
 
@@ -14,7 +21,7 @@ void game_handle_select(Game *game, int x, int y) {
     if(game->state != GAME_PLAYING) {
         return;
     }
-    
+
     if(!game->has_selected) {
         // 选中棋子
         Piece *piece = &game->chess.board[y][x];
@@ -25,16 +32,16 @@ void game_handle_select(Game *game, int x, int y) {
         }
     } else {
         // 移动棋子
-        if(chess_is_valid_move(&game->chess, 
+        if(chess_is_valid_move(&game->chess,
             game->selected_x, game->selected_y, x, y)) {
-            
+
             // 执行移动
             chess_move_piece(&game->chess,
                 game->selected_x, game->selected_y, x, y);
-            
+
             // 检查游戏是否结束
             if(chess_is_game_over(&game->chess)) {
-                game->state = game->current_player == 0 ? 
+                game->state = game->current_player == 0 ?
                              GAME_WIN_RED : GAME_WIN_BLACK;
             } else {
                 // 切换玩家
@@ -49,10 +56,10 @@ bool game_is_over(Game *game) {
     return game->state != GAME_PLAYING;
 }
 
-void game_get_move_info(Game *game, int from_x, int from_y, 
+void game_get_move_info(Game *game, int from_x, int from_y,
                        int to_x, int to_y, MoveInfo *info) {
     int dy = to_y - from_y;
-    
+
     if(dy == 0) {
         info->type = MOVE_HORIZONTAL;
         info->steps = game->current_player == 0 ? 9-to_x : to_x+1;

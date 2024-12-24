@@ -18,6 +18,8 @@ enum GameScreen {
     SCREEN_GAME      // 游戏界面
 };
 
+extern int init_current_player;
+
 // 游戏结构体
 typedef struct {
     Chess chess;                 // 棋盘状态
@@ -60,7 +62,7 @@ bool game_is_over(Game *game);
  * @param to_x,to_y 目标位置
  * @param info 移动信息输出
  */
-void game_get_move_info(Game *game, int from_x, int from_y, 
+void game_get_move_info(Game *game, int from_x, int from_y,
                        int to_x, int to_y, MoveInfo *info);
 
 #endif
