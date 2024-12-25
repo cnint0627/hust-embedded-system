@@ -8,10 +8,10 @@
 
 // 按钮ID
 enum ButtonID {
-    BTN_NONE,
-    BTN_START,    // 开始游戏
-    BTN_RESTART,  // 重新开始
-    BTN_EXIT      // 退出游戏
+    GAME_BTN_NONE,
+    GAME_BTN_START,    // 开始游戏
+    GAME_BTN_RESTART,  // 重新开始
+    GAME_BTN_EXIT      // 退出游戏
 };
 
 // 按钮结构

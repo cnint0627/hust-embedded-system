@@ -11,7 +11,7 @@ static Button menu_buttons[] = {
         .w = BUTTON_WIDTH,
         .h = BUTTON_HEIGHT,
         .text = "开始游戏",
-        .id = BTN_START,
+        .id = GAME_BTN_START,
         .color = 0x4CAF50
     },
     {
@@ -20,7 +20,7 @@ static Button menu_buttons[] = {
         .w = BUTTON_WIDTH,
         .h = BUTTON_HEIGHT,
         .text = "退出游戏",
-        .id = BTN_EXIT,
+        .id = GAME_BTN_EXIT,
         .color = 0xF44336
     }
 };
@@ -33,7 +33,7 @@ static Button game_buttons[] = {
         .w = BUTTON_WIDTH,
         .h = BUTTON_HEIGHT,
         .text = "重新开始",
-        .id = BTN_RESTART,
+        .id = GAME_BTN_RESTART,
         .color = 0x4CAF50
     },
     {
@@ -42,7 +42,7 @@ static Button game_buttons[] = {
         .w = BUTTON_WIDTH,
         .h = BUTTON_HEIGHT,
         .text = "退出",
-        .id = BTN_EXIT,
+        .id = GAME_BTN_EXIT,
         .color = 0xF44336
     }
 };
@@ -53,19 +53,20 @@ static Button result_buttons[] = {
         .w = RESULT_BTN_WIDTH,
         .h = RESULT_BTN_HEIGHT,
         .text = "重新开始",
-        .id = BTN_RESTART,
+        .id = GAME_BTN_RESTART,
         .color = 0x4CAF50
     },
     {
         .w = RESULT_BTN_WIDTH,
         .h = RESULT_BTN_HEIGHT,
         .text = "返回主菜单",
-        .id = BTN_EXIT,
+        .id = GAME_BTN_EXIT,
         .color = 0xF44336
     }
 };
 
 void ui_init(void) {
+    printf("ui_init\n");
     fb_init("/dev/fb0");
     font_init("./font.ttc");
 }
@@ -86,7 +87,7 @@ static void draw_button(Button *btn) {
 void ui_draw_menu(void) {
     // 清屏
     fb_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_BOARD);
-    
+
     // 绘制标题
     fb_draw_text(
         SCREEN_WIDTH/2 - 120,
@@ -95,31 +96,59 @@ void ui_draw_menu(void) {
         64,
         COLOR_BLACK
     );
-    
+
     // 绘制按钮
     for(int i = 0; i < sizeof(menu_buttons)/sizeof(menu_buttons[0]); i++) {
         draw_button(&menu_buttons[i]);
     }
-    
+
     fb_update();
 }
 
 void ui_draw_board(Game *game, GameLog *log) {
     // 清屏
     fb_draw_rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, COLOR_BOARD);
-    
+
     // 绘制棋盘网格
     for(int i = 0; i < BOARD_HEIGHT; i++) {
         fb_draw_line(
-            BOARD_START_X, 
+            BOARD_START_X,
             BOARD_START_Y + i * GRID_SIZE,
-            BOARD_START_X + BOARD_WIDTH_PX, 
+            BOARD_START_X + BOARD_WIDTH_PX,
             BOARD_START_Y + i * GRID_SIZE,
             COLOR_GRID
         );
+
+        // 绘制行坐标
+        // if(game->show_coordinates) {
+        if(1) {
+            char coord[3];
+            sprintf(coord, "%d", i);
+            fb_draw_text(
+                BOARD_START_X - 25,
+                BOARD_START_Y + i * GRID_SIZE + 10,
+                coord,
+                20,
+                COLOR_GRID
+            );
+        }
     }
-    
+
     for(int i = 0; i < BOARD_WIDTH; i++) {
+        // 绘制列坐标
+        // if(game->show_coordinates) {
+        if(1) {
+            char coord[3];
+            sprintf(coord, "%d", i);
+            fb_draw_text(
+                BOARD_START_X + i * GRID_SIZE - 7,
+                BOARD_START_Y - 20,
+                coord,
+                20,
+                COLOR_GRID
+            );
+        }
+
         if(i == 0 || i == BOARD_WIDTH-1) {
             // 边框
             fb_draw_line(
@@ -147,7 +176,7 @@ void ui_draw_board(Game *game, GameLog *log) {
             );
         }
     }
-    
+
     // 楚河汉界
     fb_draw_text(
         BOARD_START_X + BOARD_WIDTH_PX/2 - 120,
@@ -156,7 +185,7 @@ void ui_draw_board(Game *game, GameLog *log) {
         32,
         COLOR_GRID
     );
-    
+
     // 九宫格
     // 红方
     fb_draw_line(
@@ -173,7 +202,7 @@ void ui_draw_board(Game *game, GameLog *log) {
         BOARD_START_Y + 2 * GRID_SIZE,
         COLOR_GRID
     );
-    
+
     // 黑方
     fb_draw_line(
         BOARD_START_X + 3 * GRID_SIZE,
@@ -189,17 +218,17 @@ void ui_draw_board(Game *game, GameLog *log) {
         BOARD_START_Y + 9 * GRID_SIZE,
         COLOR_GRID
     );
-    
+
     // 绘制棋子
     for(int y = 0; y < BOARD_HEIGHT; y++) {
         for(int x = 0; x < BOARD_WIDTH; x++) {
             if(game->chess.board[y][x].type != PIECE_NONE) {
                 int screen_x = BOARD_START_X + x * GRID_SIZE;
                 int screen_y = BOARD_START_Y + y * GRID_SIZE;
-                
+
                 fb_draw_circle(screen_x, screen_y, PIECE_RADIUS, 2,
                     game->chess.board[y][x].color == 0 ? COLOR_RED : COLOR_BLACK);
-                
+
                 fb_draw_text(
                     screen_x - 15,
                     screen_y + 15,
@@ -210,7 +239,7 @@ void ui_draw_board(Game *game, GameLog *log) {
             }
         }
     }
-    
+
     // 选中框
     if(game->has_selected) {
         int screen_x = BOARD_START_X + game->selected_x * GRID_SIZE;
@@ -223,11 +252,11 @@ void ui_draw_board(Game *game, GameLog *log) {
             COLOR_SELECT
         );
     }
-    
+
     // 信息面板
     fb_draw_rect(INFO_START_X, INFO_START_Y, INFO_WIDTH, INFO_HEIGHT, COLOR_INFO_BG);
     fb_draw_border(INFO_START_X, INFO_START_Y, INFO_WIDTH, INFO_HEIGHT, COLOR_GRID);
-    
+
     // 当前回合
     char turn_info[32];
     sprintf(turn_info, "当前回合：%s方", game->current_player == 0 ? "红" : "黑");
@@ -238,7 +267,7 @@ void ui_draw_board(Game *game, GameLog *log) {
         32,
         COLOR_BLACK
     );
-    
+
     // 操作日志
     fb_draw_text(
         INFO_START_X + 20,
@@ -247,7 +276,7 @@ void ui_draw_board(Game *game, GameLog *log) {
         32,
         COLOR_BLACK
     );
-    
+
     for(int i = 0; i < log->log_count; i++) {
         fb_draw_text(
             INFO_START_X + 20,
@@ -257,12 +286,12 @@ void ui_draw_board(Game *game, GameLog *log) {
             COLOR_LOG
         );
     }
-    
+
     // 按钮
     for(int i = 0; i < sizeof(game_buttons)/sizeof(game_buttons[0]); i++) {
         draw_button(&game_buttons[i]);
     }
-    
+
     fb_update();
 }
 
@@ -270,15 +299,15 @@ void ui_draw_game_result(Game *game) {
     // 计算结果面板位置
     int x = (SCREEN_WIDTH - RESULT_WIDTH) / 2;
     int y = (SCREEN_HEIGHT - RESULT_HEIGHT) / 2;
-    
+
     // 绘制结果面板
     fb_draw_rect(x, y, RESULT_WIDTH, RESULT_HEIGHT, COLOR_INFO_BG);
     fb_draw_border(x, y, RESULT_WIDTH, RESULT_HEIGHT, COLOR_GRID);
-    
+
     // 结果标题
     const char* title = game->state == GAME_WIN_RED ? "红方获胜！" : "黑方获胜！";
     Color title_color = game->state == GAME_WIN_RED ? COLOR_RED : COLOR_BLACK;
-    
+
     fb_draw_text(
         x + RESULT_WIDTH/2 - strlen(title)*5,
         y + 80,
@@ -286,13 +315,13 @@ void ui_draw_game_result(Game *game) {
         32,
         title_color
     );
-    
+
     // 更新并绘制按钮
     result_buttons[0].x = x + RESULT_WIDTH/4 - RESULT_BTN_WIDTH/2;
     result_buttons[0].y = y + RESULT_HEIGHT - RESULT_BTN_HEIGHT - 20;
     result_buttons[1].x = x + RESULT_WIDTH*3/4 - RESULT_BTN_WIDTH/2;
     result_buttons[1].y = y + RESULT_HEIGHT - RESULT_BTN_HEIGHT - 20;
-    
+
     for(int i = 0; i < 2; i++) {
         draw_button(&result_buttons[i]);
     }
@@ -300,22 +329,22 @@ void ui_draw_game_result(Game *game) {
 
 TouchResult ui_handle_touch(int screen_x, int screen_y) {
     TouchResult result = {0};
-    
+
     // 转换屏幕坐标到棋盘坐标
     result.board_x = (screen_x - BOARD_START_X + GRID_SIZE/2) / GRID_SIZE;
     result.board_y = (screen_y - BOARD_START_Y + GRID_SIZE/2) / GRID_SIZE;
-    
+
     // 检查是否在棋盘范围内
     result.valid = (result.board_x >= 0 && result.board_x < BOARD_WIDTH &&
                    result.board_y >= 0 && result.board_y < BOARD_HEIGHT);
-    
+
     return result;
 }
 
 enum ButtonID ui_check_button(int x, int y, enum GameScreen screen, Game *game) {
     Button *buttons;
     int button_count;
-    
+
     // 根据当前界面选择按钮组
     if(screen == SCREEN_MENU) {
         buttons = menu_buttons;
@@ -329,7 +358,7 @@ enum ButtonID ui_check_button(int x, int y, enum GameScreen screen, Game *game) 
             button_count = sizeof(game_buttons)/sizeof(game_buttons[0]);
         }
     }
-    
+
     // 检查点击位置
     for(int i = 0; i < button_count; i++) {
         if(x >= buttons[i].x && x < buttons[i].x + buttons[i].w &&
@@ -337,6 +366,6 @@ enum ButtonID ui_check_button(int x, int y, enum GameScreen screen, Game *game) 
             return buttons[i].id;
         }
     }
-    
-    return BTN_NONE;
+
+    return GAME_BTN_NONE;
 }

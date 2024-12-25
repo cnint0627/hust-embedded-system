@@ -2,14 +2,17 @@
 #include "game.h"
 #include <string.h>
 
-int init_current_player = 0;
+bool is_my_round(Game *game) {
+    return game->init_current_player == game->current_player;
+}
 
 void game_init(Game *game) {
-    memset(game, 0, sizeof(Game));
+    printf("game_init\n");
+    // memset(game, 0, sizeof(Game));
     chess_init(&game->chess);
     game->state = GAME_PLAYING;
-    game->current_player = init_current_player;
-    if (init_current_player) {
+    game->current_player = 0;
+    if (game->init_current_player == 0) {
         printf("红方\n");
     } else {
         printf("黑方\n");

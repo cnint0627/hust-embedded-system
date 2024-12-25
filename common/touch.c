@@ -38,17 +38,17 @@ int touch_init(char *dev)
 */
 
 //驱动上传的xy坐标范围是[0,4096)
-// #define ADJUST_X(n) ((n*SCREEN_WIDTH)>>12)  /* (n*screen_width/4096) */
-// #define ADJUST_Y(n) ((n*SCREEN_HEIGHT)>>12)  /* (n*screen_height/4096) */
-#define ADJUST_X(n) (n)  /* (n*screen_width/4096) */
-#define ADJUST_Y(n) (n)  /* (n*screen_height/4096) */
+#define ADJUST_X(n) ((n*SCREEN_WIDTH)>>12)  /* (n*screen_width/4096) */
+#define ADJUST_Y(n) ((n*SCREEN_HEIGHT)>>12)  /* (n*screen_height/4096) */
+// #define ADJUST_X(n) (n)  /* (n*screen_width/4096) */
+// #define ADJUST_Y(n) (n)  /* (n*screen_height/4096) */
 
 int touch_read(int touch_fd, int *x, int *y, int *finger)
 {
 	struct input_event data;
 	int n, ret;
 	if((n = read(touch_fd, &data, sizeof(data))) != sizeof(data)){
-		printf("touch_read error %d, errno=%d\n", n, errno);
+		// printf("touch_read error %d, errno=%d\n", n, errno);
 		return TOUCH_ERROR;
 	}
 	// printf("event read: type-code-value = %d-%d-%d\n", data.type, data.code, data.value);

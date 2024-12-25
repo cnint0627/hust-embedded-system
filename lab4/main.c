@@ -23,19 +23,21 @@ static void touch_event_cb(int fd)
 {
     int type, x, y, finger;
     type = touch_read(fd, &x, &y, &finger);
-    
+
     if (finger < 0 || finger >= 5) return;
 
     switch(type) {
     case TOUCH_PRESS:
+        printf("TOUCH_PRESS：x=%d,y=%d,finger=%d\n",x,y,finger);
         fingers[finger].active = 1;
         fingers[finger].x = x;
         fingers[finger].y = y;
         fb_draw_circle(x, y, 50, 5, colors[finger]);
         fb_update();
         break;
-        
+
     case TOUCH_MOVE:
+        printf("TOUCH_MOVE：x=%d,y=%d,finger=%d\n",x,y,finger);
 		// 只更新发生变化的区域
 		fb_draw_circle(fingers[finger].x, fingers[finger].y, 50, 5, COLOR_BACKGROUND);
 		fingers[finger].x = x;
@@ -43,13 +45,14 @@ static void touch_event_cb(int fd)
 		fb_draw_circle(x, y, 50, 5, colors[finger]);
 		fb_update();
         break;
-        
+
     case TOUCH_RELEASE:
+        printf("TOUCH_RELEASE：x=%d,y=%d,finger=%d\n",x,y,finger);
 		fb_draw_circle(fingers[finger].x, fingers[finger].y, 50, 5, COLOR_BACKGROUND);
 		fingers[finger].active = 0;
 		fb_update();
         break;
-        
+
     case TOUCH_ERROR:
         printf("close touch fd\n");
         close(fd);
@@ -69,7 +72,7 @@ int main(int argc, char *argv[])
 	touch_fd = touch_init("/dev/input/event1");
 	//添加任务, 当touch_fd文件可读时, 会自动调用touch_event_cb函数
 	task_add_file(touch_fd, touch_event_cb);
-	
+
 	task_loop(); //进入任务循环
 	return 0;
 }

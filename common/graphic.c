@@ -181,10 +181,10 @@ void fb_draw_line(int x1, int y1, int x2, int y2, int color)
     // x、y每步的增量
     float x_inc = dx / steps;
     float y_inc = dy / steps;
-    
+
     float x = x1;
     float y = y1;
-    
+
     for(int i = 0; i <= steps; i++) {
         *(buf + (int)y * SCREEN_WIDTH + (int)x) = color;
 		x += x_inc;
@@ -205,7 +205,7 @@ void fb_draw_image(int x, int y, fb_image *image, int color)
 
 	if(x<0) {w+=x; ix-=x; x=0;}
 	if(y<0) {h+=y; iy-=y; y=0;}
-	
+
 	if(x+w > SCREEN_WIDTH) {
 		w = SCREEN_WIDTH - x;
 	}
@@ -225,7 +225,7 @@ void fb_draw_image(int x, int y, fb_image *image, int color)
 
 	if(image->color_type == FB_COLOR_RGB_8880) /*lab3: jpg*/
 	{
-		src = image->content + iy * w * 4 + ix * 4; 
+		src = image->content + iy * w * 4 + ix * 4;
 		for (int i = 0; i < h; i++) {
 			// for (int j = 0; j < w; j++) {
 			// 	int* src_ = src + i * w * 4 + j * 4;
@@ -237,7 +237,7 @@ void fb_draw_image(int x, int y, fb_image *image, int color)
 	}
 	else if(image->color_type == FB_COLOR_RGBA_8888) /*lab3: png*/
 	{
-		src = image->content + iy * w * 4 + ix * 4; 
+		src = image->content + iy * w * 4 + ix * 4;
 		for (int i = 0; i < h; i++) {
 			for (int j = 0; j < w; j++) {
 				char* src_ = src + i * w * 4 + j * 4;	// B G R A
@@ -266,7 +266,7 @@ void fb_draw_image(int x, int y, fb_image *image, int color)
 		char g = color >> 8;
 		char b = color;
 
-		src = image->content + iy * w + ix; 
+		src = image->content + iy * w + ix;
 		for (int i = 0; i < h; i++) {
 			for (int j = 0; j < w; j++) {
 				char* src_ = src + i * w + j;	// A
@@ -325,7 +325,7 @@ void fb_draw_text(int x, int y, char *text, int font_size, int color)
 }
 
 
-/** 
+/**
  * 画一个圆（Bresenham算法）
  * @param x0: 圆心横坐标
  * @param y0: 圆心纵坐标
@@ -335,7 +335,7 @@ void fb_draw_text(int x, int y, char *text, int font_size, int color)
  */
 void fb_draw_circle(int x0, int y0, int r, int b, int color) {
     int *buf = _begin_draw(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
-    
+
     void plot(int x, int y) {
         if(x >= 0 && x < SCREEN_WIDTH && y >= 0 && y < SCREEN_HEIGHT) {
             *(buf + y * SCREEN_WIDTH + x) = color;
@@ -347,7 +347,7 @@ void fb_draw_circle(int x0, int y0, int r, int b, int color) {
         int x = 0;
         int y = radius;
         int d = 3 - 2 * radius;
-        
+
         while(x <= y) {
             // 在每个八分圆弧上画更多的点
             plot(x0 + x, y0 + y);
@@ -358,7 +358,7 @@ void fb_draw_circle(int x0, int y0, int r, int b, int color) {
             plot(x0 + x + 1, y0 - y);
             plot(x0 - x, y0 - y);
             plot(x0 - x - 1, y0 - y);
-            
+
             plot(x0 + y, y0 + x);
             plot(x0 + y, y0 + x + 1); // 填补纵向间隙
             plot(x0 - y, y0 + x);
@@ -379,7 +379,7 @@ void fb_draw_circle(int x0, int y0, int r, int b, int color) {
     }
 }
 
-/** 
+/**
  * 画一个圆（弃用，效率低）
  * @param x0: 圆心横坐标
  * @param y0: 圆心纵坐标
@@ -412,6 +412,6 @@ void fb_draw_circle_deprecated(int x0, int y0, int r, int b, int color) {
 		}
 		x+=0.01;
 	}
-	return; 
+	return;
 }
 

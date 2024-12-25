@@ -18,13 +18,12 @@ enum GameScreen {
     SCREEN_GAME      // 游戏界面
 };
 
-extern int init_current_player;
-
 // 游戏结构体
 typedef struct {
     Chess chess;                 // 棋盘状态
     enum GameState state;        // 游戏状态
-    int current_player;          // 当前玩家(0:红方,1:黑方)
+    int init_current_player;     // 当前玩家(0:红方,1:黑方)
+    int current_player;          // 当前下棋的玩家
     bool has_selected;           // 是否已选中棋子
     int selected_x, selected_y;  // 选中的棋子位置
 } Game;
@@ -40,6 +39,13 @@ typedef struct {
  * @param game 游戏指针
  */
 void game_init(Game *game);
+
+/**
+ * @brief 是否为本本机玩家
+ * @param game 游戏指针
+ * @return
+ */
+bool is_my_round(Game *game);
 
 /**
  * 处理选择位置
